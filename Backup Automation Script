@@ -1,0 +1,50 @@
+import shutil
+import os
+from datetime import datetime
+import logging
+
+# --- STEP 1: Logging Configuration ---
+# Creates a log file to keep track of backup success or failure
+logging.basicConfig(filename='backup_log.log', level=logging.INFO, format='%(asctime)s - %(message)s')
+
+def create_automated_backup():
+    # --- STEP 2: Path Definitions ---
+    # Source: The folder you want to protect
+    source_dir = "C:/ProjectData/SourceFolder"
+    
+    # Destination: Where the backup file will be stored
+    backup_root = "D:/MyBackups"
+    
+    # Check if the destination directory exists; if not, create it
+    if not os.path.exists(backup_root):
+        os.makedirs(backup_root)
+        print(f"Created backup directory: {backup_root}")
+
+    # --- STEP 3: Generate Dynamic Filename ---
+    # Adding a timestamp ensures that no two backups have the same name
+    # Format: backup_2000-01-21_1645.zip
+    timestamp = datetime.now().strftime("%Y-%m-%d_%H%M")
+    backup_filename = f"backup_{timestamp}"
+    
+    # Complete path for the final archive (without .zip extension)
+    final_output_path = os.path.join(backup_root, backup_filename)
+
+    # --- STEP 4: Create the Archive (Compression) ---
+    print(f" Starting backup process for: {source_dir}")
+    
+    try:
+        # shutil.make_archive(base_name, format, root_dir)
+        # This compresses the entire folder into a single .zip file
+        shutil.make_archive(final_output_path, 'zip', source_dir)
+        
+        success_msg = f" Backup Successful: {final_output_path}.zip"
+        print(success_msg)
+        logging.info(success_msg)
+        
+    except Exception as e:
+        error_msg = f" Backup Failed: {str(e)}"
+        print(error_msg)
+        logging.error(error_msg)
+
+if __name__ == "__main__":
+    create_automated_backup()
