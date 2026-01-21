@@ -1,0 +1,96 @@
+import os
+import shutil
+import logging
+from pathlib import Path
+
+# --- STEP 1: Logging Configuration ---
+# This creates 'organizer.log' to record every file move for traceability
+logging.basicConfig(
+    filename='organizer.log', 
+    level=logging.INFO, 
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+
+# --- STEP 2: The Rule Book (Category Mapping) ---
+#  Define which extension belongs to which folder
+RULES = {
+    "Documents": [".pdf", ".docx", ".txt", ".xlsx", ".pptx"],
+    "Images": [".jpg", ".jpeg", ".png", ".gif", ".svg"],
+    "Videos": [".mp4", ".mkv", ".mov", ".avi"],
+    "Audio": [".mp3", ".wav", ".aac"],
+    "Archives": [".zip", ".rar", ".tar", ".gz"]
+}
+
+# --- STEP 3: Duplicate Handler (Safety First) ---
+def get_safe_name(destination):
+    """
+    Checks if a file already exists in the target folder.
+    If yes, it renames the file by adding a counter (e.g., photo_1.jpg).
+    """
+    if not os.path.exists(destination):
+        return destination
+    
+    path = Path(destination)
+    name, ext = path.stem, path.suffix
+    parent = path.parent
+    
+    counter = 1
+    # Loop until a unique filename is found
+    while os.path.exists(destination):
+        destination = os.path.join(parent, f"{name}_{counter}{ext}")
+        counter += 1
+    return destination
+
+# --- STEP 4: The Main Organizer Logic ---
+def organize_folder(folder_path):
+    print(f" Initializing organization for: {folder_path}")
+    
+    # Change the current working directory to the target folder
+    if not os.path.exists(folder_path):
+        print(" Error: Path not found!")
+        return
+        
+    os.chdir(folder_path)
+
+    # Loop through every item in the folder
+    for item in os.listdir():
+        # Skip if it's a directory or the log file itself
+        if os.path.isdir(item) or item == 'organizer.log':
+            continue
+
+        # Extract extension and convert to lowercase for standardization
+        extension = Path(item).suffix.lower()
+        moved = False
+
+        # Match extension against our Rules
+        for category, extensions in RULES.items():
+            if extension in extensions:
+                # Create category folder if it doesn't exist
+                if not os.path.exists(category):
+                    os.makedirs(category)
+                
+                # Determine new path and handle potential duplicates
+                target_path = os.path.join(category, item)
+                target_path = get_safe_name(target_path)
+                
+                # Move the file and log the success
+                try:
+                    shutil.move(item, target_path)
+                    logging.info(f"MOVED: {item} -> {target_path}")
+                    print(f" Sorted: {item}")
+                    moved = True
+                except Exception as e:
+                    logging.error(f"FAILED: Could not move {item}. Error: {e}")
+                break
+        
+        # If extension is not in RULES, move to 'Others' folder
+        if not moved:
+            if not os.path.exists("Others"):
+                os.makedirs("Others")
+            shutil.move(item, os.path.join("Others", item))
+            logging.info(f"OTHERS: {item} moved to Others folder")
+
+if __name__ == "__main__":
+    path = input("Enter the absolute path of the folder to organize: ")
+    organize_folder(path)
+    print("\n Mission Accomplished! Review 'organizer.log' for details.")
