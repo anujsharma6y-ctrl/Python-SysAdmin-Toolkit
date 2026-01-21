@@ -1,0 +1,60 @@
+import subprocess
+import json
+import os
+from datetime import datetime
+
+# --- Step 1: Base Setup ---
+report_data = {}
+# Unique ID helps differentiate between multiple runs
+report_data["report_id"] = datetime.now().strftime("%Y%m%d%H%M%S")
+report_data["timestamp"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+print(f"Starting Audit ID: {report_data['report_id']}")
+
+# --- Step 2: System Identity ---
+try:
+    result = subprocess.run(["hostname"], capture_output=True, text=True, check=True)
+    report_data["system_name"] = result.stdout.strip()
+except Exception as e:
+    report_data["system_name"] = "Unknown"
+    print(f"Identity Error: {e}")
+
+# --- Step 3: Hardware Metrics (Indentation Fixed) ---
+try:
+    # Capturing disk details via Windows WMIC
+    disk_cmd = subprocess.run(["wmic", "logicaldisk", "get", "caption,freespace,size"], 
+                               capture_output=True, text=True, check=True) 
+    report_data["disk_info"] = disk_cmd.stdout.strip()
+except Exception as e:
+    report_data["disk_info"] = "Unavailable"
+    print(f"Storage Error: {e}")
+
+# --- Step 4: Health Logic (Moved up so it saves into the JSON) ---
+if "disk_info" in report_data and len(report_data["disk_info"]) > 10:
+    report_data["health_status"] = "HEALTHY"
+    report_data["security_note"] = "All systems operational."
+else:
+    report_data["health_status"] = "CRITICAL"
+    report_data["security_note"] = "Data incomplete!"
+
+# --- Step 5: Professional File Saving ---
+file_name = "system_report.json" 
+try:
+    with open(file_name, "w") as f:
+        json.dump(report_data, f, indent=4)
+    print(f"Report saved: {file_name}")
+except IOError as e:
+    print(f"File Error: Could not save report. {e}")
+
+# --- Step 6: Audit Logging ---
+try:
+    log_file = "audit.log"
+    with open(log_file, "a") as log:
+        # Added Health Status to the log for quick visual checks
+        log.write(f"[{report_data['timestamp']}] - ID: {report_data['report_id']} - STATUS: {report_data['health_status']}\n")
+except IOError as e:
+    print(f"Logging Error: {e}")
+
+# --- Final Console Output ---
+print("\n--- Final JSON Preview ---")
+print(json.dumps(report_data, indent=4))
