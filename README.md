@@ -22,7 +22,7 @@ This repository contains 7 specialized automation tools:
 - **Description:** Professional backup solution for critical directories.
 - **Key Features:** Creates date-stamped, compressed ZIP archives using `shutil`.
 
-### 5. 🏥 Service Health Checker
+### 5.  Service Health Checker
 - **Description:** A self-healing monitoring script for system services.
 - **Key Features:** Monitors services like Nginx/Apache and automatically attempts a restart if they crash.
 
@@ -34,6 +34,10 @@ This repository contains 7 specialized automation tools:
 - **Description:** A security compliance tool to audit file access.
 - **Key Features:** Detects "World Writable" files and alerts on potential security vulnerabilities.
 
+### 8.  Advanced File Organizer
+- **Description:** A smart script to clean up cluttered directories (like Downloads).
+- **Key Features:** Automatically sorts files into categorized folders (Images, Docs, Media, etc.) based on their extensions.
+
 ---
 
 ##  Tech Stack & Requirements
@@ -43,8 +47,15 @@ This repository contains 7 specialized automation tools:
 
 ##  Project Structure
 Each project is organized into its own directory:
-/Python-SysAdmin-Toolkit ├── 01_System_Report/ ├── 02_User_Manager/ ├── 03_Disk_Space_Alert/├── 04_Backup_Automation/ ├── 05_Service_Checker/ ├── 06_Log_Cleaner/ └── 07_Permission_Auditor/
-
+/Python-SysAdmin-Toolkit
+├── 01_System_Report/
+├── 02_User_Manager/
+├── 03_Disk_Space_Alert/
+├── 04_Backup_Automation/
+├── 05_Service_Checker/
+├── 06_Log_Cleaner/
+├── 07_Permission_Auditor/
+└── 08_File_Organizer/  
 
 ##  Author
 **Anuj Sharma**
