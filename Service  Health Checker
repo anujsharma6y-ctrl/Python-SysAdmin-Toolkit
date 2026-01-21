@@ -1,0 +1,42 @@
+import subprocess
+import logging
+import time
+
+# --- STEP 1: Diary Configuration ---
+logging.basicConfig(filename='service_health.log', level=logging.INFO, 
+                    format='%(asctime)s - STATUS: %(message)s')
+
+def check_service_status(service_name):
+    print(f"🔍 Checking health of: {service_name}...")
+    
+    # --- STEP 2: The Status Command ---
+    # We use 'systemctl' which is the boss of services in Linux
+    try:
+        # 'is-active' command returns 0 if service is running
+        cmd = subprocess.run(["systemctl", "is-active", service_name], 
+                              capture_output=True, text=True)
+        
+        status = cmd.stdout.strip()
+        
+        if status == "active":
+            print(f" {service_name} is running perfectly.")
+            logging.info(f"{service_name} is UP and Running.")
+        else:
+            # --- STEP 3: Self-Healing Logic (Restarting) ---
+            print(f" {service_name} is DOWN! Attempting to restart...")
+            logging.warning(f"{service_name} is DOWN! Restarting now...")
+            
+            # Trying to restart the service
+            subprocess.run(["systemctl", "restart", service_name])
+            
+            # Re-check after restart
+            print(f" Restart command sent to {service_name}.")
+            
+    except Exception as e:
+        print(f" Error talking to System Manager: {e}")
+        logging.error(f"Failed to check {service_name}: {e}")
+
+if __name__ == "__main__":
+    # Example: Checking 'nginx' or 'apache2' or 'mysql'
+    target_service = "nginx" 
+    check_service_status(target_service)
