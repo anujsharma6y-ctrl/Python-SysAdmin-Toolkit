@@ -1,0 +1,41 @@
+import os
+import time
+import logging
+
+# --- STEP 1: Log the Cleaning Activity ---
+logging.basicConfig(filename='cleanup_history.log', level=logging.INFO, 
+                    format='%(asctime)s - %(message)s')
+
+def cleanup_old_files(folder_path, days_limit):
+    # STEP 1: Always check if the folder is actually there
+    if not os.path.exists(folder_path):
+        print(f" Path Not Found: {folder_path}")
+        return
+
+    seconds_limit = days_limit * 24 * 60 * 60
+    current_time = time.time()
+
+    # STEP 2: Now it is safe to list files
+    for filename in os.listdir(folder_path):
+        file_path = os.path.join(folder_path, filename)
+
+        # Skip if it's a folder, we only want to delete files
+        if os.path.isfile(file_path):
+            # Get the last modification time of the file
+            file_age = os.path.getmtime(file_path)
+
+            # --- STEP 3: Compare Age ---
+            if (current_time - file_age) > seconds_limit:
+                try:
+                    os.remove(file_path)
+                    msg = f"DELETED: {filename} (Older than {days_limit} days)"
+                    print(f" {msg}")
+                    logging.info(msg)
+                except Exception as e:
+                    logging.error(f"Error deleting {filename}: {e}")
+
+if __name__ == "__main__":
+    # Path where your logs or old backups are kept
+    target_dir = "C:/MyProject/Logs" 
+    # Delete files older than 30 days
+    cleanup_old_files(target_dir, 30)
