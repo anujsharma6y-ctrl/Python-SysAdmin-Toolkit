@@ -1,0 +1,42 @@
+import subprocess
+import os
+import sys
+
+def create_user():
+    print(f"\n{'='*40}")
+    print(" PROFESSIONAL USER MANAGER")
+    print(f"{'='*40}\n")
+
+    # --- STEP 1: Admin Privilege Check ---
+    # On Windows, 'net session' command only works if you are Admin
+    try:
+        is_admin = subprocess.run(["net", "session"], capture_output=True, shell=True).returncode == 0
+        if not is_admin:
+            print(" ERROR: Please run this script as ADMINISTRATOR!")
+            return
+    except Exception:
+        print(" Could not verify admin rights.")
+        return
+
+    # --- STEP 2: Get Inputs ---
+    username = input("Enter new username: ")
+    password = input("Enter password for this user: ")
+
+    # --- STEP 3: Execution (The Messenger) ---
+    print(f"\n Creating account for {username}...")
+    
+    # Windows Command: net user [name] [pass] /add
+    command = ["net", "user", username, password, "/add"]
+    
+    try:
+        # We use check=True so it jumps to 'except' if user already exists
+        subprocess.run(command, check=True, capture_output=True, text=True, shell=True)
+        print(f" SUCCESS: User '{username}' is now ready!")
+        
+    except subprocess.CalledProcessError as e:
+        print(f" SYSTEM ERROR: Maybe the user already exists or password is too weak.")
+        # e.stderr will show the exact reason from Windows
+        print(f"Details: {e.stderr}")
+
+if __name__ == "__main__":
+    create_user()
