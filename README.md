@@ -1,8 +1,7 @@
 🛠️ Python-SysAdmin-Toolkit
 A modular suite of Python scripts to automate system administration, monitoring, and maintenance tasks.
 
-🚀 Projects Overview (Alphabetical Order)
-Each tool is designed to solve a specific administrative challenge, organized for quick access:
+🚀 Projects Overview: This repository contains 8 production-ready automation scripts designed to streamline Linux and Windows system administration. From real-time monitoring and self-healing services to automated backups and security auditing, this toolkit provides a centralized solution to eliminate manual IT tasks using Python.
 
 1. Advanced File Organizer
 Description: A smart script to clean up cluttered directories (like Downloads).
